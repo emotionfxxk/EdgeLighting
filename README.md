@@ -1,1 +1,1 @@
-Edge Light for android Device, Demo
+Edge Lighting for android Device, Demo
