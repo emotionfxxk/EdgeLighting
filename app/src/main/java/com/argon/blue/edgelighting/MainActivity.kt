@@ -62,7 +62,8 @@ class MainActivity : ComponentActivity() {
         )
         intent.putExtra(
             WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-            ComponentName(this, SqueezWallpaperService::class.java)
+            ComponentName(this, MyWallpaperService::class.java)
+            //ComponentName(this, SqueezWallpaperService::class.java)
         )
         startActivity(intent);
     }

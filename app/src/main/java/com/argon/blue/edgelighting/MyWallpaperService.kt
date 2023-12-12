@@ -1,25 +1,17 @@
 package com.argon.blue.edgelighting
 
-import android.Manifest
 import android.animation.ValueAnimator
-import android.app.WallpaperManager
-import android.content.pm.PackageManager
+import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Shader
 import android.graphics.SweepGradient
-import android.graphics.drawable.Drawable
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.animation.LinearInterpolator
-import androidx.compose.ui.graphics.SweepGradientShader
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
+
 
 class MyWallpaperService  : WallpaperService(){
 
@@ -65,7 +57,7 @@ class MyWallpaperService  : WallpaperService(){
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = 20f
 
-
+            paint.setShadowLayer(40f, 0f, 0f, Color.parseColor("#FF0000"));
 
             rotationAnimator.apply {
                 addUpdateListener {
