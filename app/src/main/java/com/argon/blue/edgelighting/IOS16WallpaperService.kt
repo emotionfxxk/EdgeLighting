@@ -47,6 +47,7 @@ class IOS16WallpaperService  : WallpaperService(){
             }
             timePaint = Paint().apply {
                 color = Color.WHITE
+                alpha = 230
                 textSize = 210f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
@@ -54,6 +55,7 @@ class IOS16WallpaperService  : WallpaperService(){
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
+                alpha = 230
                 textSize = 56f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
@@ -73,8 +75,8 @@ class IOS16WallpaperService  : WallpaperService(){
             val scaleFactor = maxOf(wallpaperWidth / screenWidth, wallpaperHeight / screenHeight)
             options.inJustDecodeBounds = false
             options.inSampleSize = scaleFactor
-            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg, options)
-            wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
+            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2_fg, options)
+            wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2_bg, options)
             runnable?.let { handler?.post(it) }
         }
 
@@ -132,14 +134,14 @@ class IOS16WallpaperService  : WallpaperService(){
                 val timeText = android.text.format.DateFormat.format("HH:mm", dateTime).toString()
                 datePaint?.let {
                     canvas.drawText(dateFormat.format(Date()), canvas.width / 2f,
-                        180f, it
+                        280f, it
                     )
                 }
                 timePaint?.let {
                     canvas.drawText(
                         timeText,
                         canvas.width / 2f,
-                        370f,
+                        480f,
                         it
                     )
                 }
