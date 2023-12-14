@@ -10,10 +10,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.SweepGradient
 import android.graphics.Rect
+import android.graphics.Typeface
+import android.os.Handler
+import android.os.Looper
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.animation.LinearInterpolator
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class IOS16WallpaperService  : WallpaperService(){
@@ -26,6 +32,34 @@ class IOS16WallpaperService  : WallpaperService(){
     private inner class MyWallpaperEngine : WallpaperService.Engine() {
         private var wallpaperFgBitmap : Bitmap ?= null
         private var wallpaperBgBitmap : Bitmap ?= null
+        private var timePaint:Paint ?= null
+        private var datePaint:Paint ?= null
+        private var handler: Handler? = null
+        private var runnable: Runnable? = null
+
+        init {
+            handler = Handler(Looper.getMainLooper())
+            runnable = object : Runnable {
+                override fun run() {
+                    drawWallpaper(surfaceHolder)
+                    handler?.postDelayed(this, 1000)
+                }
+            }
+            timePaint = Paint().apply {
+                color = Color.WHITE
+                textSize = 200f
+                isAntiAlias = true
+                textAlign = Paint.Align.CENTER
+                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
+            }
+            datePaint = Paint().apply {
+                color = Color.WHITE
+                textSize = 60f
+                isAntiAlias = true
+                textAlign = Paint.Align.CENTER
+                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
+            }
+        }
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
@@ -41,6 +75,7 @@ class IOS16WallpaperService  : WallpaperService(){
             options.inSampleSize = scaleFactor
             wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg, options)
             wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
+            runnable?.let { handler?.post(it) }
         }
 
         override fun onDestroy() {
@@ -49,6 +84,7 @@ class IOS16WallpaperService  : WallpaperService(){
             wallpaperFgBitmap = null
             wallpaperBgBitmap?.recycle()
             wallpaperBgBitmap = null
+            runnable?.let { handler?.removeCallbacks(it) }
         }
 
         override fun onSurfaceCreated(holder:SurfaceHolder) {
@@ -58,6 +94,11 @@ class IOS16WallpaperService  : WallpaperService(){
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible);
+            if (visible) {
+                runnable?.let { handler?.post(it) }
+            } else {
+                runnable?.let { handler?.removeCallbacks(it) }
+            }
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
@@ -83,6 +124,25 @@ class IOS16WallpaperService  : WallpaperService(){
                 val srcRect = Rect(0, 0, wallpaperFgBitmap.width, wallpaperFgBitmap.height)
                 val dstRect = Rect(0, 0, canvas.width, canvas.height)
                 canvas.drawBitmap(wallpaperBgBitmap, srcRect, dstRect, null)
+
+
+                val time = System.currentTimeMillis()
+                val dateTime = java.util.Date(time)
+                val dateFormat = SimpleDateFormat("EEEE, d", Locale.getDefault())
+                val timeText = android.text.format.DateFormat.format("HH:mm", dateTime).toString()
+                datePaint?.let {
+                    canvas.drawText(dateFormat.format(Date()), canvas.width / 2f,
+                        180f, it
+                    )
+                }
+                timePaint?.let {
+                    canvas.drawText(
+                        timeText,
+                        canvas.width / 2f,
+                        370f,
+                        it
+                    )
+                }
 
                 canvas.drawBitmap(wallpaperFgBitmap, srcRect, dstRect, null)
             } finally {
