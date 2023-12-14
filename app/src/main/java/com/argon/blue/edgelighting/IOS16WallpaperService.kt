@@ -36,7 +36,9 @@ class IOS16WallpaperService  : WallpaperService(){
         private var datePaint:Paint ?= null
         private var handler: Handler? = null
         private var runnable: Runnable? = null
-
+        private var alphaOfFont:Int = 230 // 90% alpha
+        private var dateTextBounds:Rect = Rect()
+        private var timeTextBounds:Rect = Rect()
         init {
             handler = Handler(Looper.getMainLooper())
             runnable = object : Runnable {
@@ -47,7 +49,7 @@ class IOS16WallpaperService  : WallpaperService(){
             }
             timePaint = Paint().apply {
                 color = Color.WHITE
-                alpha = 230
+                alpha = alphaOfFont
                 textSize = 210f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
@@ -55,7 +57,7 @@ class IOS16WallpaperService  : WallpaperService(){
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
-                alpha = 230
+                alpha = alphaOfFont
                 textSize = 56f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
@@ -123,21 +125,25 @@ class IOS16WallpaperService  : WallpaperService(){
             try {
                 canvas = holder.lockCanvas()
                 canvas.drawColor(Color.BLACK)
+                // draw background image
                 val srcRect = Rect(0, 0, wallpaperFgBitmap.width, wallpaperFgBitmap.height)
                 val dstRect = Rect(0, 0, canvas.width, canvas.height)
                 canvas.drawBitmap(wallpaperBgBitmap, srcRect, dstRect, null)
 
-
+                // draw date & time
                 val time = System.currentTimeMillis()
                 val dateTime = java.util.Date(time)
                 val dateFormat = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
                 val timeText = android.text.format.DateFormat.format("HH:mm", dateTime).toString()
                 datePaint?.let {
-                    canvas.drawText(dateFormat.format(Date()), canvas.width / 2f,
+                    val dateString:String = dateFormat.format(Date())
+                    it.getTextBounds(dateString, 0,dateString.length, dateTextBounds)
+                    canvas.drawText(dateString, canvas.width / 2f,
                         280f, it
                     )
                 }
                 timePaint?.let {
+                    it.getTextBounds(timeText, 0,timeText.length, timeTextBounds)
                     canvas.drawText(
                         timeText,
                         canvas.width / 2f,
@@ -146,6 +152,7 @@ class IOS16WallpaperService  : WallpaperService(){
                     )
                 }
 
+                // draw foreground image
                 canvas.drawBitmap(wallpaperFgBitmap, srcRect, dstRect, null)
             } finally {
                 canvas?.let { holder.unlockCanvasAndPost(it) }
