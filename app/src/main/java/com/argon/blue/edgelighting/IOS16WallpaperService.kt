@@ -47,14 +47,14 @@ class IOS16WallpaperService  : WallpaperService(){
             }
             timePaint = Paint().apply {
                 color = Color.WHITE
-                textSize = 200f
+                textSize = 210f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
-                textSize = 60f
+                textSize = 56f
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
@@ -128,7 +128,7 @@ class IOS16WallpaperService  : WallpaperService(){
 
                 val time = System.currentTimeMillis()
                 val dateTime = java.util.Date(time)
-                val dateFormat = SimpleDateFormat("EEEE, d", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
                 val timeText = android.text.format.DateFormat.format("HH:mm", dateTime).toString()
                 datePaint?.let {
                     canvas.drawText(dateFormat.format(Date()), canvas.width / 2f,
