@@ -37,8 +37,11 @@ class IOS16WallpaperService  : WallpaperService(){
         private var handler: Handler? = null
         private var runnable: Runnable? = null
         private var alphaOfFont:Int = 230 // 90% alpha
-        private var dateTextBounds:Rect = Rect()
-        private var timeTextBounds:Rect = Rect()
+        private var dateStartYOffsetInDip = 96f
+        private var dateTimeYOffsetIntervalInDip = 24f
+        private val dateDefaultTextSizeInSp = 20f
+        private val timeDefaultTextSizeInSp = 75f
+        private var screenDensity = 0f
         init {
             handler = Handler(Looper.getMainLooper())
             runnable = object : Runnable {
@@ -47,22 +50,24 @@ class IOS16WallpaperService  : WallpaperService(){
                     handler?.postDelayed(this, 1000)
                 }
             }
+            screenDensity = resources.displayMetrics.density
             timePaint = Paint().apply {
                 color = Color.WHITE
                 alpha = alphaOfFont
-                textSize = 210f
+                textSize = timeDefaultTextSizeInSp * screenDensity
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
-                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
+                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) // 设置字体样式
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
                 alpha = alphaOfFont
-                textSize = 56f
+                textSize = dateDefaultTextSizeInSp * screenDensity
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
             }
+
         }
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
@@ -137,17 +142,16 @@ class IOS16WallpaperService  : WallpaperService(){
                 val timeText = android.text.format.DateFormat.format("HH:mm", dateTime).toString()
                 datePaint?.let {
                     val dateString:String = dateFormat.format(Date())
-                    it.getTextBounds(dateString, 0,dateString.length, dateTextBounds)
                     canvas.drawText(dateString, canvas.width / 2f,
-                        280f, it
+                        screenDensity * dateStartYOffsetInDip + dateDefaultTextSizeInSp * screenDensity / 2, it
                     )
                 }
                 timePaint?.let {
-                    it.getTextBounds(timeText, 0,timeText.length, timeTextBounds)
                     canvas.drawText(
                         timeText,
                         canvas.width / 2f,
-                        480f,
+                        dateDefaultTextSizeInSp * screenDensity + (timeDefaultTextSizeInSp * screenDensity) / 2 +
+                                (dateStartYOffsetInDip + dateTimeYOffsetIntervalInDip) * screenDensity,
                         it
                     )
                 }
