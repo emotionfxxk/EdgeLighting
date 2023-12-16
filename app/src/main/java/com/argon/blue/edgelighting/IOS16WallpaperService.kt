@@ -57,7 +57,8 @@ class IOS16WallpaperService  : WallpaperService(){
                 textSize = timeDefaultTextSizeInSp * screenDensity
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
-                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) // 设置字体样式
+                //typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) // 设置字体样式
+                typeface = Typeface.createFromAsset(assets, "fonts/NeverMindRounded-Medium.ttf") // 设置字体样式
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
