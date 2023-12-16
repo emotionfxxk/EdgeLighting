@@ -58,7 +58,7 @@ class IOS16WallpaperService  : WallpaperService(){
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
                 //typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) // 设置字体样式
-                typeface = Typeface.createFromAsset(assets, "fonts/NeverMindRounded-Medium.ttf") // 设置字体样式
+                typeface = Typeface.createFromAsset(assets, "fonts/NeverMindRounded-Bold.ttf") // 设置字体样式
             }
             datePaint = Paint().apply {
                 color = Color.WHITE
@@ -66,7 +66,8 @@ class IOS16WallpaperService  : WallpaperService(){
                 textSize = dateDefaultTextSizeInSp * screenDensity
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
-                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
+                //typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) // 设置字体样式
+                typeface = Typeface.createFromAsset(assets, "fonts/SulphurPoint-Regular.otf") // 设置字体样式
             }
 
         }
@@ -83,8 +84,8 @@ class IOS16WallpaperService  : WallpaperService(){
             val scaleFactor = maxOf(wallpaperWidth / screenWidth, wallpaperHeight / screenHeight)
             options.inJustDecodeBounds = false
             options.inSampleSize = scaleFactor
-            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2_fg, options)
-            wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2_bg, options)
+            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg, options)
+            wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
             runnable?.let { handler?.post(it) }
         }
 
