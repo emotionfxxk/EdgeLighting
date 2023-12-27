@@ -58,6 +58,17 @@
             <meta-data android:name="android.service.wallpaper"
                 android:resource="@xml/livewallpaper"/>
         </service>
+        <service android:name="MatrixLiveWallpaperService"
+            android:label="iOS16Wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "android.service.wallpaper.WallpaperService"/>
+            </intent-filter>
+            <meta-data android:name="android.service.wallpaper"
+                android:resource="@xml/livewallpaper"/>
+        </service>
     </application>
 
 </manifest>
