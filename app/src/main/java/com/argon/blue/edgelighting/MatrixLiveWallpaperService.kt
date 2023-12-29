@@ -1,23 +1,23 @@
 package com.argon.blue.edgelighting
 
+import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.os.Handler
-import android.os.Looper
+import android.os.HandlerThread
 import android.service.wallpaper.WallpaperService
-import android.util.Log
 import android.view.SurfaceHolder
 import kotlin.random.Random
 
 
 class MatrixLiveWallpaperService  : WallpaperService(){
-
-
     override fun onCreateEngine(): WallpaperService.Engine {
         return MyWallpaperEngine()
     }
@@ -39,7 +39,7 @@ class MatrixLiveWallpaperService  : WallpaperService(){
         private var lenOfVerticalString = 0
 
         private var matrixPaint:Paint
-        private var handler: Handler? = null
+        private var drawingHandler: Handler? = null
         private var runnable: Runnable? = null
         private var gradient:LinearGradient ? = null
         private val matrix = Matrix()
@@ -55,19 +55,22 @@ class MatrixLiveWallpaperService  : WallpaperService(){
                 isAntiAlias = true
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) // 设置字体样式
+                maskFilter = BlurMaskFilter(2f, BlurMaskFilter.Blur.NORMAL)
             }
-            matrixPaint.setShadowLayer(25f, 0f, 0f, Color.GREEN)
+            matrixPaint.setShadowLayer(40f, 2f, 2f, Color.GREEN)
+
 
             chWidth = matrixPaint?.measureText(matrixCharset.get(0).toString())!!
             matrixColumns = (resources.displayMetrics.widthPixels / chWidth).toInt()
             lenOfVerticalString = (resources.displayMetrics.heightPixels / matrixPaint.textSize).toInt() + 1;
-            lenOfVisibleString = (lenOfVerticalString / 1.8f).toInt()
+            lenOfVisibleString = (lenOfVerticalString / 2f).toInt()
             gradient = LinearGradient(
                 resources.displayMetrics.widthPixels / 2f,
                 0f,
                 resources.displayMetrics.widthPixels / 2f,
                 lenOfVisibleString * matrixPaint.textSize,
-                intArrayOf(Color.TRANSPARENT, Color.GREEN),
+                intArrayOf(Color.TRANSPARENT, Color.parseColor("#7F00C800").toInt(),
+                    Color.parseColor("#FF00FF46").toInt()),
                 null,
                 Shader.TileMode.CLAMP
             )
@@ -77,13 +80,22 @@ class MatrixLiveWallpaperService  : WallpaperService(){
                 stringMatrix.add(generateRandomString(matrixCharset, lenOfVerticalString))
             }
 
-            handler = Handler(Looper.getMainLooper())
+            var drawingThread = HandlerThread("MatrixDrawingThread")
+            drawingThread.start()
+            drawingHandler= Handler(drawingThread.looper)
             runnable = object : Runnable {
                 override fun run() {
                     drawMatrix(surfaceHolder)
-                    handler?.postDelayed(this, speedInMillion)
+                    drawingHandler?.postDelayed(this, speedInMillion)
                 }
             }
+        }
+
+        private fun startDraw() {
+            runnable?.let { drawingHandler?.postDelayed(it, speedInMillion) }
+        }
+        private fun stopDraw() {
+            runnable?.let { drawingHandler?.removeCallbacks(it) }
         }
 
         fun generateRandomString(charSet:String, length:Int) : String {
@@ -97,33 +109,29 @@ class MatrixLiveWallpaperService  : WallpaperService(){
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
-            val screenWidth = resources.displayMetrics.widthPixels
-            val screenHeight = resources.displayMetrics.heightPixels
-            runnable?.let { handler?.post(it) }
         }
 
         override fun onDestroy() {
             super.onDestroy()
-            runnable?.let { handler?.removeCallbacks(it) }
         }
 
         override fun onSurfaceCreated(holder:SurfaceHolder) {
             super.onSurfaceCreated(holder)
-            drawMatrix(holder)
+            startDraw()
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible);
             if (visible) {
-                runnable?.let { handler?.post(it) }
+                startDraw()
             } else {
-                runnable?.let { handler?.removeCallbacks(it) }
+                stopDraw()
             }
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
             super.onSurfaceDestroyed(holder)
-
+            stopDraw()
         }
 
         override fun onSurfaceChanged(
@@ -131,7 +139,6 @@ class MatrixLiveWallpaperService  : WallpaperService(){
             width: Int, height: Int
         ) {
             super.onSurfaceChanged(holder, format, width, height)
-            drawMatrix(holder)
         }
 
         private fun drawMatrix(holder:SurfaceHolder){
@@ -161,8 +168,6 @@ class MatrixLiveWallpaperService  : WallpaperService(){
                         var visibleStr = strColumn.substring(startIndex, endIndex)
                         for (i in 0 until visibleStr.length) {
                             var ch = visibleStr[i].toString()
-                            //var chWidth = matrixPaint?.measureText(ch)
-                            //canvas.drawText(ch.toString(), xPos, yPos , matrixPaint)
                             canvas.drawText(ch.toString(), xPos, yPos + startIndex * matrixPaint.textSize, matrixPaint)
                             yPos += matrixPaint.textSize
                         }
