@@ -1,3 +1,11 @@
 Edge Lighting for android Device, Demo
 
 абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ
+
+val portugueseCharacters = "abcdefghijklmnopqrstuvwxyzáàâãçéêíóôõúABCDEFGHIJKLMNOPQRSTUVWXYZÁÀÂÃÇÉÊÍÓÔÕÚ"
+val spanishCharacters = "abcdefghijklmnopqrstuvwxyzáéíóúüñABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÜÑ"
+val thaiCharacters = "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮะาำเแโใไๅ็่้๊๋์"
+frenchCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàâæçéèêëîïôœùûüÿÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸ"
+val germanCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZßäöüÄÖÜ"
+val vietnameseCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàảãáạăẳẵắặâẩẫấậđèẻẽéẹêềễếệìỉĩíịòỏõóọôồỗốộơởỡớợùủũúụưừữứựỳỷỹýỵ"
+val arabicCharacters = "ابتثجحخدذرزسشصضطظعغفقكلمنهويىة٠١٢٣٤٥٦٧٨٩"
