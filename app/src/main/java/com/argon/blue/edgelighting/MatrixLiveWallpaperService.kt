@@ -23,13 +23,17 @@ class MatrixLiveWallpaperService  : WallpaperService(){
     }
 
     private inner class MyWallpaperEngine : WallpaperService.Engine() {
-        private var matrixCharset : String = "゠アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレワヰヱヲンヺ・ーヽヿ0123456789"
+        //private var matrixCharset : String = "゠アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレワヰヱヲンヺ・ーヽヿ0123456789"
+        //private var matrixCharset : String = "゠ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ0123456789"
+        //private var matrixCharset : String = "゠абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789"
+        private var matrixCharset : String = "゠กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮะาำเแโใไๅ็่้๊๋์0123456789"
+        //private var matrixCharset : String = "鼠牛虎兔龍蛇馬羊猴雞狗豬水火木金土仁義禮智信命愛和誌氣力道喜福夢強心忠勇德禪緣壽榮幸美花富錢囍豐貴神恨死活鬼高低矮靜醜輸勝贏飛悲歡吻怒笑性煩誠忍弟姐妹妻夫父母友春夏秋冬"
         private var rainbowSpeed : Float = 1.75f
         private var rainbowOn : Boolean = true
         private var rainbowLightness: Int = 60
         private var rainbowSaturation: Int = 100
         private var speedInMillion:Long = 60
-        private var matrixTextSize:Float =  13f // size in dip
+        private var matrixTextSize:Float =  15f // size in dip
         private var matrixColumns:Int = 0
         private var chWidth:Float = 0f
         private var dropsEndIndex = mutableListOf<Int>()
@@ -68,8 +72,11 @@ class MatrixLiveWallpaperService  : WallpaperService(){
                 0f,
                 resources.displayMetrics.widthPixels / 2f,
                 lenOfVisibleString * matrixPaint.textSize,
-                intArrayOf(Color.TRANSPARENT, Color.parseColor("#7F00C800").toInt(),
-                    Color.parseColor("#FF00FF46").toInt()),
+                intArrayOf(Color.TRANSPARENT,
+                    Color.parseColor("#7F00C800").toInt(),
+                    Color.parseColor("#FF00FF46").toInt(),
+                    Color.parseColor("#FF00FF00").toInt(),
+                    Color.WHITE),
                 null,
                 Shader.TileMode.CLAMP
             )
