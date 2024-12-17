@@ -3,7 +3,6 @@ package com.argon.blue.edgelighting
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.SweepGradient
@@ -12,9 +11,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.animation.LinearInterpolator
-import androidx.core.view.ViewCompat
 
-class SqueezWallpaperService  : WallpaperService(){
+class SqueezeWallpaperService  : WallpaperService(){
 
     override fun onCreateEngine(): WallpaperService.Engine {
         return MyWallpaperEngine()

@@ -38,8 +38,30 @@
             <meta-data android:name="android.service.wallpaper"
                 android:resource="@xml/livewallpaper"/>
         </service>
-        <service android:name="SqueezWallpaperService"
+        <service android:name="SqueezeWallpaperService"
             android:label="LiveWallpaper Sample"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "android.service.wallpaper.WallpaperService"/>
+            </intent-filter>
+            <meta-data android:name="android.service.wallpaper"
+                android:resource="@xml/livewallpaper"/>
+        </service>
+        <service android:name="EdgeLightingWallpaperService"
+            android:label="Edge Lighting"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "android.service.wallpaper.WallpaperService"/>
+            </intent-filter>
+            <meta-data android:name="android.service.wallpaper"
+                android:resource="@xml/livewallpaper"/>
+        </service>
+        <service android:name=".EdgeLighting2WallpaperService"
+            android:label="Edge Lighting"
             android:permission="android.permission.BIND_WALLPAPER"
             android:exported="true">
             <intent-filter>

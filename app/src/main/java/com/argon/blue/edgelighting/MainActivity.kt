@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
             //ComponentName(this, MatrixLiveWallpaperService::class.java)
             ComponentName(this, IOS16WallpaperService::class.java)
             //ComponentName(this, MyWallpaperService::class.java)
-            //ComponentName(this, SqueezWallpaperService::class.java)
+            //ComponentName(this, EdgeLighting2WallpaperService::class.java)
         )
         startActivity(intent);
     }

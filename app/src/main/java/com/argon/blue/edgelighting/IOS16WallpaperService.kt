@@ -45,7 +45,7 @@ class IOS16WallpaperService  : WallpaperService(){
         private var handler: Handler? = null
         private var runnable: Runnable? = null
         private var alphaOfFont:Int = 230 // 90% alpha
-        private var dateStartYOffsetInDip = 112f
+        private var dateStartYOffsetInDip = 130f
         private var dateTimeYOffsetIntervalInDip = 24f
         private val dateDefaultTextSizeInSp = 20f
         private val timeDefaultTextSizeInSp = 75f
