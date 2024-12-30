@@ -7,14 +7,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.SweepGradient
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Handler
@@ -22,22 +19,18 @@ import android.os.Looper
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import android.view.WindowManager
-import android.view.animation.LinearInterpolator
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.Executor
 
 
 class IOS16WallpaperService  : WallpaperService(){
 
-
     override fun onCreateEngine(): WallpaperService.Engine {
-        return MyWallpaperEngine()
+        return DepthWallpaperEngine()
     }
 
-    private inner class MyWallpaperEngine : WallpaperService.Engine() {
+    private inner class DepthWallpaperEngine : WallpaperService.Engine() {
         private var wallpaperFgBitmap : Bitmap ?= null
         private var wallpaperBgBitmap : Bitmap ?= null
         private var timePaint:Paint ?= null
@@ -45,7 +38,7 @@ class IOS16WallpaperService  : WallpaperService(){
         private var handler: Handler? = null
         private var runnable: Runnable? = null
         private var alphaOfFont:Int = 230 // 90% alpha
-        private var dateStartYOffsetInDip = 130f
+        private var dateStartYOffsetInDip = 120f
         private var dateTimeYOffsetIntervalInDip = 24f
         private val dateDefaultTextSizeInSp = 20f
         private val timeDefaultTextSizeInSp = 75f
@@ -59,6 +52,7 @@ class IOS16WallpaperService  : WallpaperService(){
         private var isScreenLockOn = false
         private var screenStateReceiver:ScreenStateReceiver ?=null
         private var unlockWatchDogRunnable :Runnable?= null
+
         init {
             handler = Handler(Looper.getMainLooper())
             runnable = object : Runnable {
@@ -103,6 +97,7 @@ class IOS16WallpaperService  : WallpaperService(){
 
         }
 
+
         inner class ScreenStateReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 Log.d("HAHA", "onReceive=${intent?.action}")
@@ -137,7 +132,41 @@ class IOS16WallpaperService  : WallpaperService(){
             val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
             filter.addAction(Intent.ACTION_SCREEN_ON)
             registerReceiver(screenStateReceiver, filter)
-            //val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+
+            // get the transparent height of foreground image
+            val width = wallpaperFgBitmap!!.width
+            val height = wallpaperFgBitmap!!.height
+            var transparentHeight = 0
+            var allTransparent = true
+            for (y in 0 until height) {
+                for (x in 0 until width) {
+                    val pixel = wallpaperFgBitmap!!.getPixel(x, y)
+                    val alpha = Color.alpha(pixel)
+                    if (alpha!= 0) {
+                        allTransparent = false
+                        break
+                    }
+                }
+                if (!allTransparent) {
+                    transparentHeight = y
+                    break
+                }
+            }
+            if (allTransparent) {
+                transparentHeight = height
+            }
+
+
+            if (transparentHeight != height) {
+                val transRatioInH = transparentHeight / height.toFloat()
+                val displayMetrics = resources.displayMetrics
+                Log.d("HAHA", "transRatioInH=$transRatioInH")
+                val dateTextHeight =
+                    (timeDefaultTextSizeInSp + dateDefaultTextSizeInSp + dateTimeYOffsetIntervalInDip) * screenDensity
+                //dateStartYOffsetInDip = (2400 * transRatioInH  - dateTextHeight * (1 - 0.15f)) / screenDensity
+                Log.d("HAHA", "dateStartYOffsetInDip=$dateStartYOffsetInDip")
+            }
 
         }
 
@@ -232,7 +261,8 @@ class IOS16WallpaperService  : WallpaperService(){
                 canvas = holder.lockCanvas()
                 canvas.drawColor(Color.BLACK)
                 // draw background image
-                val srcRect = Rect(0, 0, wallpaperFgBitmap.width, wallpaperFgBitmap.height)
+
+                val srcRect = Rect(0, 0, wallpaperBgBitmap.width, wallpaperBgBitmap.height)
                 val dstRect = Rect(0, 0, canvas.width, canvas.height)
                 canvas.drawBitmap(wallpaperBgBitmap, srcRect, dstRect, null)
 
@@ -267,7 +297,8 @@ class IOS16WallpaperService  : WallpaperService(){
                 }
 
                 // draw foreground image
-                canvas.drawBitmap(wallpaperFgBitmap, srcRect, dstRect, null)
+                val srcFGRect = Rect(0, 0, wallpaperFgBitmap.width, wallpaperFgBitmap.height)
+                canvas.drawBitmap(wallpaperFgBitmap, srcFGRect, dstRect, null)
             } finally {
                 canvas?.let { holder.unlockCanvasAndPost(it) }
             }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EdgeLightingDemo</string>
+    <string name="btn_cus">customize</string>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DepthWallpaperPreview">
+        <attr name="defaultFG" format="reference" />
+        <attr name="defaultBG" format="reference" />
+        <attr name="dateFont" format="string" />
+        <attr name="timeFont" format="string" />
+        <attr name="dateFontSize" format="dimension" />
+        <attr name="timeFontSize" format="dimension" />
+        <attr name="dateTextColor" format="color" />
+        <attr name="timeTextColor" format="color" />
+        <attr name="cornerRadius" format="dimension" />
+    </declare-styleable>
+</resources>
