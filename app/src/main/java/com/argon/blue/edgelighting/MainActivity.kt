@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
+import com.afollestad.viewpagerdots.DotsIndicator
 import com.argon.blue.edgelighting.ui.theme.EdgeLightingDemoTheme
 
 
@@ -67,9 +68,10 @@ class MainActivity : ComponentActivity() {
         viewPager.setPageTransformer(false,transformer)
         viewPager.setOffscreenPageLimit(3);
 
-
-
+        val dots: DotsIndicator = findViewById<DotsIndicator>(R.id.pageIndicator)
+        dots.attachViewPager(viewPager)
     }
+
     fun onClick(view: View) {
         Log.d("GG","onClick")
         val intent = Intent(
