@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
 import com.argon.blue.edgelighting.ui.theme.EdgeLightingDemoTheme
 
 
@@ -36,7 +37,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout);
+        //setContentView(R.layout.layout)
+        setContentView(R.layout.main_layout);
 
         // Check if the READ_EXTERNAL_STORAGE permission is granted
         if (ContextCompat.checkSelfPermission(this, READ_MEDIA_IMAGES)
@@ -54,6 +56,18 @@ class MainActivity : ComponentActivity() {
             // Read external storage code here
             Log.d("DD", "permission granted!")
         }
+
+
+
+        val viewPager = findViewById<ViewPager>(R.id.viewPager)
+        val dataList = listOf("Card 1", "Card 2", "Card 3", "Card 4")
+        val adapter = PreviewPagerAdapter(dataList)
+        viewPager.adapter = adapter
+        val transformer:ShadowTransformer = ShadowTransformer(viewPager, adapter)
+        viewPager.setPageTransformer(false,transformer)
+        viewPager.setOffscreenPageLimit(3);
+
+
 
     }
     fun onClick(view: View) {
