@@ -3,6 +3,7 @@ package com.argon.blue.edgelighting
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -14,12 +15,15 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.argon.blue.edgelighting.data.WallpaperData
 import java.io.IOException
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -42,7 +46,7 @@ class DepthWallpaperPreview @JvmOverloads constructor(
     }
     private val path = Path()
     private var cornerRadius = 20f
-
+    private var wallpaper: WallpaperData ?= null
 
     init {
         val inflater = LayoutInflater.from(context)
@@ -54,6 +58,17 @@ class DepthWallpaperPreview @JvmOverloads constructor(
 
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
+                Log.d("SEAN", "w=${width}, h=${height}")
+                val bitmap = loadScaledImageFromAssets(context, wallpaper!!.backImage.url,
+                    bgImage.width, bgImage.height)
+                if (bitmap != null) {
+                    bgImage.setImageBitmap(bitmap)
+                }
+                val fgBitmap = loadScaledImageFromAssets(context, wallpaper!!.frontImage.url,
+                    fgImage.width, fgImage.height)
+                if (bitmap != null) {
+                    fgImage.setImageBitmap(fgBitmap)
+                }
                 updateDateTimePosY(fgImage.drawable)
                 viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
@@ -143,15 +158,64 @@ class DepthWallpaperPreview @JvmOverloads constructor(
         dateTimeUpdater?.let { handler?.removeCallbacks(it) }
     }
 
+    fun updateWallpaperData(wallpaperData:WallpaperData) {
+        wallpaper = wallpaperData
+    }
+
+    private fun loadScaledImageFromAssets(context: Context, fileName: String, reqWidth: Int, reqHeight: Int): Bitmap? {
+        var inputStream: InputStream? = null
+        try {
+            val assetManager = context.assets
+            // 第一次解码仅获取图片的尺寸信息
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            inputStream = assetManager.open(fileName)
+            BitmapFactory.decodeStream(inputStream, null, options)
+            inputStream.close()
+
+            // 计算缩放比例
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+
+            // 第二次解码，根据缩放比例加载图片
+            options.inJustDecodeBounds = false
+            inputStream = assetManager.open(fileName)
+            return BitmapFactory.decodeStream(inputStream, null, options)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        return null
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        Log.d("SEAN", "reqH=${reqHeight}, reqW=${reqWidth}, w=${width}, h=${height}")
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
     private fun updateDateTimePosY(drawable: Drawable) {
-        //Log.d("HAHA", "DateHeight=${dateTextView.height}, Time=${timeTextView.height}")
         val overlapHeight = ((dateTextView.height + timeTextView.height) * 0.05f).toInt()
 
         if (drawable is BitmapDrawable) {
             val bitmap = drawable.bitmap
             val transparentTopHeight = getTransparentTopHeight(bitmap)
 
-            //Log.d("HAHA", "顶部透明区域高度: $transparentTopHeight")
             if(dateTextView.layoutParams is RelativeLayout.LayoutParams) {
                 (dateTextView.layoutParams as LayoutParams).topMargin = transparentTopHeight + overlapHeight -
                         dateTextView.height - timeTextView.height

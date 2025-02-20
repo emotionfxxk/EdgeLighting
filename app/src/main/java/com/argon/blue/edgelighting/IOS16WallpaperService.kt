@@ -123,7 +123,7 @@ class IOS16WallpaperService  : WallpaperService(){
             val scaleFactor = maxOf(wallpaperWidth / screenWidth, wallpaperHeight / screenHeight)
             options.inJustDecodeBounds = false
             options.inSampleSize = scaleFactor
-            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg2, options)
+            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg, options)
             wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
             runnable?.let { handler?.post(it) }
             keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager

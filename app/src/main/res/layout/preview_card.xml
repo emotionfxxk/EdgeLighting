@@ -7,16 +7,31 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     app:cardUseCompatPadding="true">
-    <com.argon.blue.edgelighting.DepthWallpaperPreview
-        android:id="@+id/preview"
-        android:background="@color/black"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:timeFont="fonts/OpenRunde-Bold.otf"
-        app:dateFont="fonts/FiraSans-Light.ttf"
-        app:dateFontSize="20sp"
-        app:timeFontSize="56sp"
-        app:timeTextColor="@color/white"
-        app:dateTextColor="@color/white"
-        app:cornerRadius="28dp" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/black">
+        <TextView
+            android:id="@+id/cardName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"/>
+        <com.argon.blue.edgelighting.DepthWallpaperPreview
+            android:id="@+id/preview"
+            android:background="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:timeFont="fonts/OpenRunde-Bold.otf"
+            app:dateFont="fonts/FiraSans-Light.ttf"
+            app:dateFontSize="20sp"
+            app:timeFontSize="56sp"
+            app:timeTextColor="@color/white"
+            app:dateTextColor="@color/white"
+            app:cornerRadius="28dp" />
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

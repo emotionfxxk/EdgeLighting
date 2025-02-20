@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.viewpagerdots.DotsIndicator
+import com.argon.blue.edgelighting.data.SAMPLE_WALLPAPER_JSON
+import com.argon.blue.edgelighting.data.WallpaperDataParser
 import com.argon.blue.edgelighting.ui.theme.EdgeLightingDemoTheme
 
 
@@ -59,10 +61,11 @@ class MainActivity : ComponentActivity() {
         }
 
 
+        val wallpaperDataList = WallpaperDataParser.parseJsonArray(SAMPLE_WALLPAPER_JSON)
 
         val viewPager = findViewById<ViewPager>(R.id.viewPager)
-        val dataList = listOf("Card 1", "Card 2", "Card 3", "Card 4")
-        val adapter = PreviewPagerAdapter(dataList)
+        //val dataList = listOf("Card 1", "Card 2", "Card 3", "Card 4")
+        val adapter = PreviewPagerAdapter(wallpaperDataList)
         viewPager.adapter = adapter
         val transformer:ShadowTransformer = ShadowTransformer(viewPager, adapter)
         viewPager.setPageTransformer(false,transformer)
