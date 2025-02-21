@@ -19,6 +19,10 @@ import android.os.Looper
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import com.argon.blue.edgelighting.data.WallpaperData
+import com.argon.blue.edgelighting.data.WallpaperDataModel
+import java.io.IOException
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,7 +34,7 @@ class IOS16WallpaperService  : WallpaperService(){
         return DepthWallpaperEngine()
     }
 
-    private inner class DepthWallpaperEngine : WallpaperService.Engine() {
+    private inner class DepthWallpaperEngine() : WallpaperService.Engine() {
         private var wallpaperFgBitmap : Bitmap ?= null
         private var wallpaperBgBitmap : Bitmap ?= null
         private var timePaint:Paint ?= null
@@ -52,6 +56,8 @@ class IOS16WallpaperService  : WallpaperService(){
         private var isScreenLockOn = false
         private var screenStateReceiver:ScreenStateReceiver ?=null
         private var unlockWatchDogRunnable :Runnable?= null
+
+        private lateinit var wallpaperData: WallpaperData
 
         init {
             handler = Handler(Looper.getMainLooper())
@@ -111,20 +117,48 @@ class IOS16WallpaperService  : WallpaperService(){
                 }
             }
         }
+
+
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
+            Log.d("SEAN", "curPos=${WallpaperDataModel.currentWallpaperIndex()}")
+            wallpaperData = WallpaperDataModel.getWallpaperList().get(WallpaperDataModel.currentWallpaperIndex())
+
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
-            BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
-            val wallpaperWidth = options.outWidth
-            val wallpaperHeight = options.outHeight
-            val screenWidth = resources.displayMetrics.widthPixels
-            val screenHeight = resources.displayMetrics.heightPixels
-            val scaleFactor = maxOf(wallpaperWidth / screenWidth, wallpaperHeight / screenHeight)
-            options.inJustDecodeBounds = false
-            options.inSampleSize = scaleFactor
-            wallpaperFgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_fg, options)
-            wallpaperBgBitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
+            //BitmapFactory.decodeResource(resources, R.drawable.sample1_bg, options)
+            val context = this@IOS16WallpaperService.applicationContext
+            val assetManager = context.assets
+            var inputStream: InputStream? = null
+            try {
+                inputStream = assetManager.open(wallpaperData.backImage.url)
+                BitmapFactory.decodeStream(inputStream, null, options)
+                val wallpaperWidth = options.outWidth
+                val wallpaperHeight = options.outHeight
+                val screenWidth = resources.displayMetrics.widthPixels
+                val screenHeight = resources.displayMetrics.heightPixels
+                val scaleFactor = maxOf(wallpaperWidth / screenWidth, wallpaperHeight / screenHeight)
+                options.inJustDecodeBounds = false
+                options.inSampleSize = scaleFactor
+                inputStream.close()
+
+                inputStream = assetManager.open(wallpaperData.backImage.url)
+                wallpaperBgBitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                inputStream.close()
+
+                inputStream = assetManager.open(wallpaperData.frontImage.url)
+                wallpaperFgBitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                inputStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } finally {
+                try {
+                    inputStream?.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+
             runnable?.let { handler?.post(it) }
             keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
@@ -132,7 +166,6 @@ class IOS16WallpaperService  : WallpaperService(){
             val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
             filter.addAction(Intent.ACTION_SCREEN_ON)
             registerReceiver(screenStateReceiver, filter)
-
 
             // get the transparent height of foreground image
             val width = wallpaperFgBitmap!!.width

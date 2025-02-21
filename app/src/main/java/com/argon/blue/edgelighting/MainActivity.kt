@@ -2,7 +2,6 @@ package com.argon.blue.edgelighting
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.app.ActionBar.LayoutParams
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
@@ -25,12 +24,16 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.viewpagerdots.DotsIndicator
 import com.argon.blue.edgelighting.data.SAMPLE_WALLPAPER_JSON
+import com.argon.blue.edgelighting.data.WallpaperData
+import com.argon.blue.edgelighting.data.WallpaperDataModel
 import com.argon.blue.edgelighting.data.WallpaperDataParser
 import com.argon.blue.edgelighting.ui.theme.EdgeLightingDemoTheme
 
 
 class MainActivity : ComponentActivity() {
     private val STORAGE_PERMISSION_REQUEST_CODE = 1
+    lateinit var pager:ViewPager
+    lateinit var wallpaperData: List<WallpaperData>
     var storage_permissions = arrayOf<String>(
         READ_EXTERNAL_STORAGE
     )
@@ -65,27 +68,24 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        val wallpaperDataList = WallpaperDataParser.parseJsonArray(SAMPLE_WALLPAPER_JSON)
-
-        val viewPager = findViewById<ViewPager>(R.id.viewPager)
-        //val dataList = listOf("Card 1", "Card 2", "Card 3", "Card 4")
-        val adapter = PreviewPagerAdapter(wallpaperDataList)
-        viewPager.adapter = adapter
-        val transformer:ShadowTransformer = ShadowTransformer(viewPager, adapter)
-        viewPager.setPageTransformer(false,transformer)
-        viewPager.setOffscreenPageLimit(3);
+        wallpaperData = WallpaperDataModel.getWallpaperList()
+        pager = findViewById<ViewPager>(R.id.viewPager)
+        val adapter = PreviewPagerAdapter(wallpaperData)
+        pager.adapter = adapter
+        val transformer:ShadowTransformer = ShadowTransformer(pager, adapter)
+        pager.setPageTransformer(false,transformer)
+        pager.setOffscreenPageLimit(3);
 
         val dots: DotsIndicator = findViewById<DotsIndicator>(R.id.pageIndicator)
-        dots.attachViewPager(viewPager)
+        dots.attachViewPager(pager)
 
-        val viewTreeObserver = viewPager.viewTreeObserver
+        val viewTreeObserver = pager.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                viewPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-                val lp = viewPager.layoutParams  as LinearLayout.LayoutParams
+                pager.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val lp = pager.layoutParams  as LinearLayout.LayoutParams
                 val displayMetrics = resources.displayMetrics
-                val drawWidth = viewPager.width - viewPager.paddingLeft - viewPager.paddingRight
+                val drawWidth = pager.width - pager.paddingLeft - pager.paddingRight
                 lp.height = ((drawWidth.toFloat() / displayMetrics.widthPixels.toFloat())
                         * displayMetrics.heightPixels.toFloat()).toInt()
                 lp.topMargin = (displayMetrics.heightPixels - lp.height) / 2 - TypedValue.applyDimension(
@@ -93,25 +93,23 @@ class MainActivity : ComponentActivity() {
                     24f,
                     resources.displayMetrics
                 ).toInt()
-
-                viewPager.layoutParams = lp
-                Log.d("SEAN", "onCreate drawWidth=${drawWidth}, padding=${viewPager.paddingLeft}, viewPager height=${viewPager.height}")
+                pager.layoutParams = lp
             }
         })
     }
 
     fun onClick(view: View) {
-        Log.d("GG","onClick")
         val intent = Intent(
             WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER
         )
         intent.putExtra(
             WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-            //ComponentName(this, MatrixLiveWallpaperService::class.java)
             ComponentName(this, IOS16WallpaperService::class.java)
+            //ComponentName(this, MatrixLiveWallpaperService::class.java)
             //ComponentName(this, MyWallpaperService::class.java)
             //ComponentName(this, EdgeLighting2WallpaperService::class.java)
         )
+        WallpaperDataModel.updateCurrentWallpaperIndex(pager.currentItem)
         startActivity(intent);
     }
 
