@@ -37,7 +37,7 @@ class DepthWallpaperPreview @JvmOverloads constructor(
     private var timeTextView:TextView
     private var bgImage:ImageView
     private var fgImage:ImageView
-
+    private var previewCard:RelativeLayout
     private var handler: Handler? = null
     private var dateTimeUpdater: Runnable? = null
 
@@ -55,17 +55,22 @@ class DepthWallpaperPreview @JvmOverloads constructor(
         timeTextView = findViewById(R.id.time)
         bgImage = findViewById(R.id.bg)
         fgImage = findViewById(R.id.fg)
+        previewCard = findViewById<RelativeLayout>(R.id.preview_card)
+
 
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                Log.d("SEAN", "w=${width}, h=${height}")
+                val displayMetrics = resources.displayMetrics
+                val layoutParams  = previewCard.layoutParams
+                layoutParams.height = ((previewCard.width.toFloat() / displayMetrics.widthPixels.toFloat())
+                        * displayMetrics.heightPixels.toFloat()).toInt()
                 val bitmap = loadScaledImageFromAssets(context, wallpaper!!.backImage.url,
-                    bgImage.width, bgImage.height)
+                    layoutParams.width, layoutParams.height)
                 if (bitmap != null) {
                     bgImage.setImageBitmap(bitmap)
                 }
                 val fgBitmap = loadScaledImageFromAssets(context, wallpaper!!.frontImage.url,
-                    fgImage.width, fgImage.height)
+                    layoutParams.width, layoutParams.height)
                 if (bitmap != null) {
                     fgImage.setImageBitmap(fgBitmap)
                 }

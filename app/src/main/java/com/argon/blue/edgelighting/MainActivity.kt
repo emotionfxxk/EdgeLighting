@@ -2,6 +2,7 @@ package com.argon.blue.edgelighting
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.app.ActionBar.LayoutParams
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
@@ -9,7 +10,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
@@ -73,6 +77,27 @@ class MainActivity : ComponentActivity() {
 
         val dots: DotsIndicator = findViewById<DotsIndicator>(R.id.pageIndicator)
         dots.attachViewPager(viewPager)
+
+        val viewTreeObserver = viewPager.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                val lp = viewPager.layoutParams  as LinearLayout.LayoutParams
+                val displayMetrics = resources.displayMetrics
+                val drawWidth = viewPager.width - viewPager.paddingLeft - viewPager.paddingRight
+                lp.height = ((drawWidth.toFloat() / displayMetrics.widthPixels.toFloat())
+                        * displayMetrics.heightPixels.toFloat()).toInt()
+                lp.topMargin = (displayMetrics.heightPixels - lp.height) / 2 - TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    24f,
+                    resources.displayMetrics
+                ).toInt()
+
+                viewPager.layoutParams = lp
+                Log.d("SEAN", "onCreate drawWidth=${drawWidth}, padding=${viewPager.paddingLeft}, viewPager height=${viewPager.height}")
+            }
+        })
     }
 
     fun onClick(view: View) {
